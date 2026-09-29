@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"code":{"$numberInt":"1"}},"name":"permissions_code_key","unique":true},{"v":{"$numberInt":"2"},"key":{"module":{"$numberInt":"1"}},"name":"permissions_module_idx"}],"uuid":"3233c870d11e40a1a40b4ffa8c83bf95","collectionName":"permissions","type":"collection"}

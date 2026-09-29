@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BRDP Mahavidyalaya - Student Fee & Report Operational Portal</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS (XLSX Export Library) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <!-- Royal Blue Left Sidebar -->
+  <aside class="app-sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-brand">
+        <div class="brand-avatar">
+          <img src="/brdp_logo.png" alt="BRDP Logo" onerror="this.src='/logo.png'; this.onerror=null;">
+        </div>
+        <div>
+          <div class="brand-title">BRDP Mahavidyalaya</div>
+          <div class="brand-sub">Reporting Portal</div>
+          <div class="readonly-badge" style="margin-top:4px;">
+            <i data-lucide="lock" style="width:12px;height:12px;"></i> View-Only Mode
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-link active" data-tab="dashboard">
+          <i data-lucide="layout-grid"></i> Dashboard
+        </button>
+        <button class="nav-link" data-tab="report-hub">
+          <i data-lucide="file-spreadsheet"></i> Master Report Hub
+        </button>
+        <button class="nav-link" data-tab="user-master-fees">
+          <i data-lucide="users"></i> User Master & Fees
+        </button>
+        <button class="nav-link" data-tab="consolidated-matrix">
+          <i data-lucide="table"></i> Consolidated Matrix
+        </button>
+        <button class="nav-link" data-tab="calling-list">
+          <i data-lucide="phone-call"></i> Student Calling List
+        </button>
+        <button class="nav-link" data-tab="student-directory">
+          <i data-lucide="graduation-cap"></i> Student Directory
+        </button>
+        <button class="nav-link" data-tab="export-center">
+          <i data-lucide="download-cloud"></i> Download Center
+        </button>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main Content Body -->
+  <div class="app-main">
+    <!-- Top White Header Bar -->
+    <header class="top-header">
+      <div class="header-search">
+        <i data-lucide="search"></i>
+        <input type="text" id="globalSearchInput" class="search-input" placeholder="Search matching words across all records (Name, Roll, Phone, Course, Address)...">
+      </div>
+
+      <div class="header-right">
+        <div class="readonly-badge" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">
+          <i data-lucide="shield-check" style="width:14px;height:14px;"></i> Strict Read-Only Operational Portal
+        </div>
+
+        <div class="user-profile">
+          <div class="user-avatar">SA</div>
+          <div class="user-info">
+            <span class="user-name">System Administrator</span>
+            <span class="user-role">Report Viewer</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Workspace -->
+    <main class="content-area">
+
+      <!-- TOP UNIVERSAL FILTER CONTROL PANEL -->
+      <section class="universal-filter-panel">
+        <div class="filter-panel-title">
+          <h3><i data-lucide="sliders" style="width:18px;height:18px;color:var(--primary-blue);"></i> Universal Master Report Filters & Search</h3>
+          <span class="record-count-badge" id="masterRecordCountBadge">Loaded 1,250 Total Records</span>
+        </div>
+
+        <div class="filter-controls-row">
+          <!-- 1. Report Type Filter -->
+          <div class="filter-item" style="min-width:260px;">
+            <label><i data-lucide="file-text" style="width:12px;height:12px;"></i> Report Name / Type</label>
+            <select class="select-control" id="reportTypeFilter" onchange="applyGlobalFilters()">
+              <option value="USER_MASTER_FEES">1. Student & User Master Semester Fees (Merged Master)</option>
+              <option value="CONSOLIDATED_MATRIX">2. Consolidated Semester-Wise Fee Matrix</option>
+              <option value="CALLING_LIST">3. Student Fee Calling List (Pending Fees)</option>
+              <option value="STUDENT_DIRECTORY">4. Student Master Directory</option>
+              <option value="PAYMENTS">5. Payment Transactions Log</option>
+            </select>
+          </div>
+
+          <!-- 2. Course Filter -->
+          <div class="filter-item">
+            <label><i data-lucide="book-open" style="width:12px;height:12px;"></i> Course Filter</label>
+            <select class="select-control" id="courseFilter" onchange="applyGlobalFilters()">
+              <option value="ALL">All Courses (BA, B.Sc, BCA, B.Tech, MCA, BBA)</option>
+              <option value="BA">BA (Bachelor of Arts)</option>
+              <option value="B.Sc">B.Sc (Bachelor of Science)</option>
+              <option value="BCA">BCA (Computer Applications)</option>
+              <option value="B.Tech CSE">B.Tech CSE (Computer Science)</option>
+              <option value="MCA">MCA (Master of Computer Applications)</option>
+              <option value="BBA">BBA (Business Administration)</option>
+            </select>
+          </div>
+
+          <!-- 3. Fee Payment Status Filter -->
+          <div class="filter-item">
+            <label><i data-lucide="indian-rupee" style="width:12px;height:12px;"></i> Payment Status</label>
+            <select class="select-control" id="statusFilter" onchange="applyGlobalFilters()">
+              <option value="ALL">All Fee Statuses</option>
+              <option value="PAID">PAID (Fully Cleared)</option>
+              <option value="PARTIAL">PARTIAL (Balance Pending)</option>
+              <option value="PENDING">PENDING (Unpaid Fees)</option>
+            </select>
+          </div>
+
+          <!-- 4. Date Range Filters -->
+          <div class="filter-item" style="min-width:320px;">
+            <label><i data-lucide="calendar" style="width:12px;height:12px;"></i> Created / Due Date Range</label>
+            <div class="date-picker-group">
+              <input type="date" id="startDateInput" class="date-input" onchange="applyGlobalFilters()">
+              <span style="font-size:0.8rem;color:var(--text-secondary);">to</span>
+              <input type="date" id="endDateInput" class="date-input" onchange="applyGlobalFilters()">
+            </div>
+          </div>
+
+          <!-- Date Quick Presets -->
+          <div class="filter-item" style="min-width:auto;">
+            <label>Date Presets</label>
+            <div class="preset-pills">
+              <button class="preset-btn active" onclick="setPresetDate('ALL')">All Time</button>
+              <button class="preset-btn" onclick="setPresetDate('MONTH')">This Month</button>
+              <button class="preset-btn" onclick="setPresetDate('YEAR')">Session 2026</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 1: DASHBOARD OVERVIEW -->
+      <section class="tab-pane active" id="tab-dashboard">
+        <div class="page-title-row">
+          <h1 class="page-title">Dashboard Overview</h1>
+          <div style="display:flex; gap:10px;">
+            <a href="/api/reports/download/student-user-fees" class="btn btn-primary" download>
+              <i data-lucide="download"></i> Download Merged Master (.csv)
+            </a>
+            <button class="btn btn-excel" onclick="exportExcelCurrentView()">
+              <i data-lucide="file-spreadsheet"></i> Export Excel (.xlsx)
+            </button>
+          </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-container">
+          <div class="stat-card purple">
+            <div>
+              <div class="stat-label">TOTAL REGISTERED STUDENTS</div>
+              <div class="stat-num" id="statTotalStudents">1,250</div>
+            </div>
+            <div class="stat-icon-wrapper purple"><i data-lucide="users"></i></div>
+          </div>
+
+          <div class="stat-card blue">
+            <div>
+              <div class="stat-label">ACTIVE COURSES</div>
+              <div class="stat-num">6 Courses</div>
+            </div>
+            <div class="stat-icon-wrapper blue"><i data-lucide="graduation-cap"></i></div>
+          </div>
+
+          <div class="stat-card green">
+            <div>
+              <div class="stat-label">COLLECTED FEES</div>
+              <div class="stat-num" id="statCollectedFees">₹42,85,000</div>
+            </div>
+            <div class="stat-icon-wrapper green"><i data-lucide="trending-up"></i></div>
+          </div>
+
+          <div class="stat-card amber">
+            <div>
+              <div class="stat-label">PENDING FEES BALANCE</div>
+              <div class="stat-num" id="statPendingFees">₹1,84,65,000</div>
+            </div>
+            <div class="stat-icon-wrapper amber"><i data-lucide="clock"></i></div>
+          </div>
+
+          <div class="stat-card red">
+            <div>
+              <div class="stat-label">STUDENTS TO CALL</div>
+              <div class="stat-num" id="statStudentsToCall">1,215</div>
+            </div>
+            <div class="stat-icon-wrapper red"><i data-lucide="phone-call"></i></div>
+          </div>
+        </div>
+
+        <!-- Quick Download Cards Grid -->
+        <div class="main-card" style="margin-top:24px;">
+          <div class="card-header-bar">
+            <h2 class="card-title"><i data-lucide="download-cloud" style="width:18px;height:18px;color:var(--primary-blue);"></i> Instant One-Click Report Downloads</h2>
+          </div>
+          <div style="padding:20px;">
+            <div class="export-card-grid">
+              <div class="export-card">
+                <div class="export-card-header">
+                  <div class="export-icon csv"><i data-lucide="file-spreadsheet"></i></div>
+                  <div>
+                    <div class="export-card-title">Student & User Master Fees</div>
+                    <div class="export-card-sub">Merged User Master + Semester Fees (1,250 Records)</div>
+                  </div>
+                </div>
+                <a href="/api/reports/download/student-user-fees" class="btn btn-primary" download style="text-align:center;">
+                  <i data-lucide="download"></i> Download CSV
+                </a>
+              </div>
+
+              <div class="export-card">
+                <div class="export-card-header">
+                  <div class="export-icon excel"><i data-lucide="table"></i></div>
+                  <div>
+                    <div class="export-card-title">Consolidated Fee Matrix</div>
+                    <div class="export-card-sub">Semester 1 to Semester 6 Fee Breakdown</div>
+                  </div>
+                </div>
+                <a href="/api/reports/download/consolidated-matrix" class="btn btn-excel" download style="text-align:center;">
+                  <i data-lucide="download"></i> Download CSV
+                </a>
+              </div>
+
+              <div class="export-card">
+                <div class="export-card-header">
+                  <div class="export-icon calling"><i data-lucide="phone-call"></i></div>
+                  <div>
+                    <div class="export-card-title">Student Calling List</div>
+                    <div class="export-card-sub">Prioritized Calling Sheet for Fee Due Follow-up</div>
+                  </div>
+                </div>
+                <a href="/api/reports/download/calling-list" class="btn btn-primary" download style="text-align:center;">
+                  <i data-lucide="download"></i> Download CSV
+                </a>
+              </div>
+
+              <div class="export-card">
+                <div class="export-card-header">
+                  <div class="export-icon json"><i data-lucide="graduation-cap"></i></div>
+                  <div>
+                    <div class="export-card-title">Student Master Directory</div>
+                    <div class="export-card-sub">Complete Student Directory Data</div>
+                  </div>
+                </div>
+                <a href="/api/reports/download/student-directory" class="btn btn-outline" download style="text-align:center;">
+                  <i data-lucide="download"></i> Download CSV
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: MASTER REPORT HUB (Interactive Viewer) -->
+      <section class="tab-pane" id="tab-report-hub">
+        <div class="page-title-row">
+          <div>
+            <h1 class="page-title" id="activeReportTitle">Master Report Viewer</h1>
+            <p class="text-sm text-secondary" id="activeReportSubtitle">Filter, search, view, and export report records</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-excel" onclick="exportExcelCurrentView()">
+              <i data-lucide="file-spreadsheet"></i> Export View to Excel (.xlsx)
+            </button>
+            <button class="btn btn-outline" onclick="window.print()">
+              <i data-lucide="printer"></i> Print / PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="main-card">
+          <div class="card-header-bar">
+            <span id="reportFilterSummaryTag">Showing All Records</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="text-sm text-secondary">Rows per page:</span>
+              <select class="select-control" id="rowsPerPageSelect" onchange="changePageRows()">
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="10000">Show All</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table class="portal-table" id="masterReportTable">
+              <thead>
+                <tr id="masterReportHeader">
+                  <!-- Dynamic Headers -->
+                </tr>
+              </thead>
+              <tbody id="masterReportBody">
+                <!-- Dynamic Rows -->
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination Bar -->
+          <div style="padding:16px 24px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--card-border);">
+            <span class="text-sm text-secondary" id="paginationInfo">Page 1 of 1</span>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline btn-sm" id="btnPrevPage" onclick="prevPage()">Previous</button>
+              <button class="btn btn-outline btn-sm" id="btnNextPage" onclick="nextPage()">Next</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: USER MASTER & FEES -->
+      <section class="tab-pane" id="tab-user-master-fees">
+        <div class="page-title-row">
+          <h1 class="page-title">Student & User Master Semester Fees</h1>
+          <a href="/api/reports/download/student-user-fees" class="btn btn-primary" download>
+            <i data-lucide="download"></i> Download Full Report (.csv)
+          </a>
+        </div>
+        <div class="main-card">
+          <div class="card-header-bar">
+            <span>Combined User Account, Student Master & Semester-Wise Fees</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="portal-table">
+              <thead>
+                <tr id="userFeesHeader"></tr>
+              </thead>
+              <tbody id="userFeesBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: CONSOLIDATED MATRIX -->
+      <section class="tab-pane" id="tab-consolidated-matrix">
+        <div class="page-title-row">
+          <h1 class="page-title">Consolidated Semester-Wise Fee Matrix</h1>
+          <a href="/api/reports/download/consolidated-matrix" class="btn btn-excel" download>
+            <i data-lucide="download"></i> Download Fee Matrix (.csv)
+          </a>
+        </div>
+        <div class="main-card">
+          <div class="table-wrapper">
+            <table class="portal-table">
+              <thead>
+                <tr id="matrixHeader"></tr>
+              </thead>
+              <tbody id="matrixBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: STUDENT CALLING LIST -->
+      <section class="tab-pane" id="tab-calling-list">
+        <div class="page-title-row">
+          <h1 class="page-title">Student Fee Calling List</h1>
+          <a href="/api/reports/download/calling-list" class="btn btn-primary" download>
+            <i data-lucide="phone-call"></i> Download Calling List (.csv)
+          </a>
+        </div>
+        <div class="main-card">
+          <div class="table-wrapper">
+            <table class="portal-table">
+              <thead>
+                <tr id="callingHeader"></tr>
+              </thead>
+              <tbody id="callingBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: STUDENT DIRECTORY -->
+      <section class="tab-pane" id="tab-student-directory">
+        <div class="page-title-row">
+          <h1 class="page-title">Student Master Directory</h1>
+          <a href="/api/reports/download/student-directory" class="btn btn-outline" download>
+            <i data-lucide="download"></i> Download Directory (.csv)
+          </a>
+        </div>
+        <div class="main-card">
+          <div class="table-wrapper">
+            <table class="portal-table">
+              <thead>
+                <tr id="directoryHeader"></tr>
+              </thead>
+              <tbody id="directoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: EXPORT CENTER -->
+      <section class="tab-pane" id="tab-export-center">
+        <div class="page-title-row">
+          <h1 class="page-title">Download & Export Center</h1>
+        </div>
+        <div class="export-card-grid">
+          <div class="export-card">
+            <div class="export-card-header">
+              <div class="export-icon csv"><i data-lucide="file-spreadsheet"></i></div>
+              <div>
+                <div class="export-card-title">Student & User Master Fees</div>
+                <div class="export-card-sub">Merged User Master + Semester Fees (1,250 Records)</div>
+              </div>
+            </div>
+            <a href="/api/reports/download/student-user-fees" class="btn btn-primary" download style="text-align:center;">
+              <i data-lucide="download"></i> Download CSV Report
+            </a>
+          </div>
+
+          <div class="export-card">
+            <div class="export-card-header">
+              <div class="export-icon excel"><i data-lucide="table"></i></div>
+              <div>
+                <div class="export-card-title">Consolidated Fee Matrix</div>
+                <div class="export-card-sub">Semester 1 to Semester 6 Fee Breakdown (1,250 Records)</div>
+              </div>
+            </div>
+            <a href="/api/reports/download/consolidated-matrix" class="btn btn-excel" download style="text-align:center;">
+              <i data-lucide="download"></i> Download CSV Matrix
+            </a>
+          </div>
+
+          <div class="export-card">
+            <div class="export-card-header">
+              <div class="export-icon calling"><i data-lucide="phone-call"></i></div>
+              <div>
+                <div class="export-card-title">Student Calling List</div>
+                <div class="export-card-sub">Prioritized Calling Sheet for Fee Due Follow-up</div>
+              </div>
+            </div>
+            <a href="/api/reports/download/calling-list" class="btn btn-primary" download style="text-align:center;">
+              <i data-lucide="download"></i> Download Calling Sheet
+            </a>
+          </div>
+
+          <div class="export-card">
+            <div class="export-card-header">
+              <div class="export-icon json"><i data-lucide="graduation-cap"></i></div>
+              <div>
+                <div class="export-card-title">Student Master Directory</div>
+                <div class="export-card-sub">Complete Student Directory Data</div>
+              </div>
+            </div>
+            <a href="/api/reports/download/student-directory" class="btn btn-outline" download style="text-align:center;">
+              <i data-lucide="download"></i> Download Directory CSV
+            </a>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- JavaScript Engine -->
+  <script src="/js/app.js"></script>
+</body>
+</html>

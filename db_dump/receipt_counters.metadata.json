@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"year":{"$numberInt":"1"}},"name":"receipt_counters_year_key","unique":true}],"uuid":"3b85241a7aad4f90b9690b80a91b51ec","collectionName":"receipt_counters","type":"collection"}
