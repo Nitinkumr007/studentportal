@@ -1,0 +1,17 @@
+# Netlify Configuration File
+[build]
+  command = "npm run build"
+  publish = "public"
+  functions = "netlify/functions"
+
+# API Serverless Functions Redirects
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Single Page Application Fallback Redirect
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

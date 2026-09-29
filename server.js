@@ -477,9 +477,13 @@ app.get('/api/collections/:name/documents', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 BRDP Student & Fee Excel Report Generator Server`);
-  console.log(`URL: http://localhost:${PORT}`);
-  console.log(`====================================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 BRDP Student & Fee Excel Report Generator Server`);
+    console.log(`URL: http://localhost:${PORT}`);
+    console.log(`====================================================`);
+  });
+}
+
+module.exports = app;
